@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const routes = require("./routes");
 const { setupSocketIO } = require("./socket");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 // Create Express app
 const app = express();
