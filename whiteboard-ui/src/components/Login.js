@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import TextBox from "../UIComponents/TextBox";
 import Button from "../UIComponents/Button";
 import { validateForm } from "../utils/loginValidator";
+import { login, signup } from "../services/auth";
 
 const styles = {
   input:
@@ -21,6 +22,7 @@ const Login = ({ isSignup = false }) => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle input change with error clearing
   const handleChange = (field) => (e) => {
@@ -33,19 +35,40 @@ const Login = ({ isSignup = false }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e?.preventDefault();
-    const newErrors = validateForm(formData, isSignup);
 
-    if (Object.keys(newErrors).length === 0) {
-      // Form is valid, proceed with submission
-      if (isSignup) {
-        // signup(formData.username, formData.email, formData.password, formData.confirmPassword);
-      } else {
-        // login(formData.username, formData.password);
-      }
-    } else {
+    // Validate form
+    const newErrors = validateForm(formData, isSignup);
+    if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      // Prepare payload based on form type
+      const payload = isSignup
+        ? {
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+          }
+        : {
+            username: formData.username,
+            password: formData.password,
+          };
+
+      // Call appropriate auth function
+      await (isSignup ? signup(payload) : login(payload));
+    } catch (error) {
+      setErrors({
+        submit: error.message || "An error occurred. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,10 +118,17 @@ const Login = ({ isSignup = false }) => {
               error={errors.confirmPassword}
             />
           )}
+          {errors.submit && (
+            <p className="text-red-500 text-sm mb-4 text-center">
+              {errors.submit}
+            </p>
+          )}
           <Button
             label={isSignup ? "Signup" : "Login"}
             onClick={handleSubmit}
             type="submit"
+            disabled={isLoading}
+            isLoading={isLoading}
           />
         </form>
         {isSignup ? (
