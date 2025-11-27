@@ -1,13 +1,13 @@
 import routes from "./routes";
-import axios from "axios";
+import apiClient from "./axios";
 
 const signup = async (payload) => {
-  const response = await axios.post(routes.signup, payload);
+  const response = await apiClient.post(routes.signup, payload);
   return response.data;
 };
 
 const login = async (payload) => {
-  const response = await axios.post(routes.login, payload);
+  const response = await apiClient.post(routes.login, payload);
   return response.data;
 };
 
