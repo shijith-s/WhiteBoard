@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Setup REST API routes
-app.use("/", routes);
+app.use("/api", routes);
 
 // Create HTTP server
 const server = http.createServer(app);
