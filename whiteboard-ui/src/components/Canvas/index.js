@@ -53,10 +53,10 @@ const Canvas = ({ width = 1000, height = 1000 }) => {
   const { startDrawing, draw, stopDrawing } = useDrawing(canvasRef, handleDraw);
 
   return (
-    <div className="flex-1 w-[50%] h-full">
+    <div className="flex-1 w-[50%] h-full p-4">
       <canvas
         ref={canvasRef}
-        className="border border-gray-300 rounded-md shadow-lg bg-white"
+        className="border-2 border-sunset-secondary/40 rounded-xl shadow-xl bg-white hover:shadow-2xl transition-shadow duration-200"
         style={{ width: `${width}px`, height: `${height}px` }}
         onMouseDown={startDrawing}
         onMouseMove={draw}

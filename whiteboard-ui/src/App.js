@@ -1,13 +1,20 @@
 import "./App.css";
-import Canvas from "./components/Canvas";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import LoginPage from "./pages/Login";
+import SignupPage from "./pages/Signup";
 import { SocketProvider } from "./contexts/SocketContext";
 
 function App() {
   return (
     <SocketProvider>
-      <div className="App">
-        <Canvas width={1000} height={1000} />
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Routes>
+      </Router>
     </SocketProvider>
   );
 }
