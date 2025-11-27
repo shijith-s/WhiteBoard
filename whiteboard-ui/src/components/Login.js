@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import TextBox from "../UIComponents/TextBox";
 import Button from "../UIComponents/Button";
+import { validateForm } from "../utils/loginValidator";
 
 const styles = {
   input:
@@ -13,64 +14,93 @@ const styles = {
 };
 
 const Login = ({ isSignup = false }) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
 
-  const handleSubmit = () => {
-    if (isSignup) {
-      //   signup(username, email, password, confirmPassword);
-    } else {
-      //   login(username, password);
+  // Handle input change with error clearing
+  const handleChange = (field) => (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e?.preventDefault();
+    const newErrors = validateForm(formData, isSignup);
+
+    if (Object.keys(newErrors).length === 0) {
+      // Form is valid, proceed with submission
+      if (isSignup) {
+        // signup(formData.username, formData.email, formData.password, formData.confirmPassword);
+      } else {
+        // login(formData.username, formData.password);
+      }
+    } else {
+      setErrors(newErrors);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-sunset-cream via-sunset-peach to-sunset-secondary/20">
       <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-[90%] flex flex-col items-center justify-center border-2 border-sunset-secondary/30">
         <h1 className="text-3xl font-bold mb-6 text-sunset-primary">
           WhiteBoard
         </h1>
-        <TextBox
-          label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          name="wb-username"
-          id="wb-username"
-        />
-        {isSignup && (
+        <form autoComplete="off" className="w-full" onSubmit={handleSubmit}>
           <TextBox
-            type="email"
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            name="wb-email"
-            id="wb-email"
+            label="Username"
+            value={formData.username}
+            onChange={handleChange("username")}
+            name="wb-username"
+            id="wb-username"
+            error={errors.username}
           />
-        )}
-        <TextBox
-          type="password"
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          name="wb-password"
-          id="wb-password"
-        />
-        {isSignup && (
+          {isSignup && (
+            <TextBox
+              type="email"
+              label="Email"
+              value={formData.email}
+              onChange={handleChange("email")}
+              name="wb-email"
+              id="wb-email"
+              error={errors.email}
+            />
+          )}
           <TextBox
             type="password"
-            label="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            name="wb-confirm-password"
-            id="wb-confirm-password"
+            label="Password"
+            value={formData.password}
+            onChange={handleChange("password")}
+            name="wb-password"
+            id="wb-password"
+            error={errors.password}
           />
-        )}
-        <Button
-          label={isSignup ? "Signup" : "Login"}
-          onClick={handleSubmit}
-          type="submit"
-        />
+          {isSignup && (
+            <TextBox
+              type="password"
+              label="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange("confirmPassword")}
+              name="wb-confirm-password"
+              id="wb-confirm-password"
+              error={errors.confirmPassword}
+            />
+          )}
+          <Button
+            label={isSignup ? "Signup" : "Login"}
+            onClick={handleSubmit}
+            type="submit"
+          />
+        </form>
         {isSignup ? (
           <p className={styles.linkText}>
             Already have an account?&nbsp;
