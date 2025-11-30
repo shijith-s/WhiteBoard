@@ -1,35 +1,50 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 const routes = require("./routes");
 const { setupSocketIO } = require("./socket");
+const connectDB = require("./config/database");
 
 const PORT = process.env.PORT || 8000;
 
-// Create Express app
-const app = express();
-app.use(cors());
-app.use(express.json());
+// Initialize server
+const startServer = async () => {
+  try {
+    // Connect to MongoDB first
+    await connectDB();
 
-// Setup REST API routes
-app.use("/api", routes);
+    // Create Express app
+    const app = express();
+    app.use(cors());
+    app.use(express.json());
 
-// Create HTTP server
-const server = http.createServer(app);
+    // Setup REST API routes
+    app.use("/api", routes);
 
-// Setup Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
+    // Create HTTP server
+    const server = http.createServer(app);
 
-// Initialize socket.io handlers
-setupSocketIO(io);
+    // Setup Socket.IO
+    const io = new Server(server, {
+      cors: {
+        origin:process.env.CLIENT_URL,
+        methods: ["GET", "POST"],
+      },
+    });
 
-// Start server
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+    // Initialize socket.io handlers
+    setupSocketIO(io);
+
+    // Start server only after MongoDB is connected
+    server.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();

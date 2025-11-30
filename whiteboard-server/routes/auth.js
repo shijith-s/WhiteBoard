@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const response = await login(username, password);
+    const response = await login({ username, password });
     res.status(200).json(response);
   } catch (error) {
     console.error("Login error:", error);
@@ -39,7 +39,7 @@ router.post("/signup", async (req, res) => {
       });
     }
 
-    const response = await signup(username, email, password);
+    const response = await signup({ username, email, password });
     res.status(201).json(response);
   } catch (error) {
     console.error("Signup error:", error);
